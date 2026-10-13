@@ -37,5 +37,7 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: single-html-apk
-          path: 'myApp/**/*.apk'
+          name: my-apk-file
+          path: |
+            myApp/platforms/android/app/build/outputs/apk/release/*.apk
+            myApp/platforms/android/app/build/outputs/apk/debug/*.apk
