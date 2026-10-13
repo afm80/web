@@ -26,7 +26,6 @@ jobs:
         run: |
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
-          # تهيئة المشروع وجعل المجلد الحالي هو مصدر ملفات الويب
           npx cap init "HTMLApp" "com.haider.htmlapp" --web-dir .
           npx cap add android
           npx cap sync android
