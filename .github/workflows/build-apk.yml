@@ -11,38 +11,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
       - name: Set up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '17'
+          java-version: '11'
 
-      - name: Prepare Web Folder & Capacitor
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Cordova
+        run: npm install -g cordova
+
+      - name: Build Android App with Cordova
         run: |
-          mkdir www
-          find . -maxdepth 1 -name "*.html" ! -name "index.html" -exec cp {} www/index.html \; -o -name "index.html" -exec cp index.html www/ \;
+          # إنشاء مجلد المشروع
+          cordova create myApp com.haider.htmlapp "HTMLApp"
+          cd myApp
           
-          npm init -y
-          npm install @capacitor/core @capacitor/cli @capacitor/android
-          npx cap init "HTMLApp" "com.haider.htmlapp" --web-dir www
-          npx cap add android
-          npx cap sync android
-
-      - name: Clean Gradle Cache & Build APK
-        run: |
-          cd android
-          # تنظيف أي مخلفات قديمة قد تسبب تضارب
-          rm -rf .gradle
-          chmod +x gradlew
-          ./gradlew clean assembleRelease
+          # نسخ جميع ملفات HTML/JS/CSS للمشروع
+          rm -rf www/*
+          cp -r ../. www/ 2>/dev/null || true
+          
+          # إضافة منصة الأندرويد وبناء الـ APK
+          cordova platform add android
+          cordova build android --release
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: single-html-apk
-          path: android/app/build/outputs/apk/release/app-release-unsigned.apk
+          path: myApp/platforms/android/app/build/outputs/apk/release/app-release-unsigned.apk
